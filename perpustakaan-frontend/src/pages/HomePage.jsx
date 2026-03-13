@@ -206,7 +206,7 @@ export default function HomePage() {
                 </ResponsiveContainer>
               )}
             </div>
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-6 border border-gray-100 dark:border-slate-700">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-md p-6 border border-gray-100 dark:border-slate-700 overflow-visible">
               <h3 className="text-lg font-bold text-gray-700 dark:text-slate-200 mb-4">
                 🔖 Status Peminjaman
               </h3>
@@ -215,17 +215,20 @@ export default function HomePage() {
                   Belum ada data peminjaman.
                 </p>
               ) : (
-                <ResponsiveContainer width="100%" height={250}>
-                  <PieChart>
+                <ResponsiveContainer width="100%" height={280}>
+                  <PieChart
+                    margin={{ top: 40, right: 60, bottom: 20, left: 60 }}
+                  >
                     <Pie
                       data={statusData}
                       cx="50%"
-                      cy="50%"
+                      cy="55%"
                       innerRadius={60}
-                      outerRadius={90}
+                      outerRadius={85}
                       paddingAngle={5}
                       dataKey="value"
                       label={({ name, value }) => `${name}: ${value}`}
+                      labelLine={true}
                     >
                       {statusData.map((_, index) => (
                         <Cell

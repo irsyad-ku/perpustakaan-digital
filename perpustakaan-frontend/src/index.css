@@ -17,6 +17,10 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.recharts-label-list {
+  display: none !important;
+}
+
 /* Dark mode smooth transition */
 *,
 *::before,
