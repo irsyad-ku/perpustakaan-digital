@@ -18,52 +18,72 @@ class AuthController extends Controller
             'email'    => 'required|string|email|unique:users',
             'password' => 'required|string|min:6|confirmed',
         ]);
+
         if ($validator->fails()) {
             return response()->json(['status' => 'error', 'errors' => $validator->errors()], 422);
         }
+
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
         ]);
-        $token = Auth::guard('api')->login($user);
+
+        $token = Auth::login($user);
+
         return response()->json([
             'status'  => 'success',
             'message' => 'Registrasi berhasil',
             'user'    => $user,
             'token'   => $token,
+            'token_type' => 'bearer',
+            'expires_in' => Auth::factory()->getTTL() * 60,
         ], 201);
     }
 
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
-        if (!$token = Auth::guard('api')->attempt($credentials)) {
-            return response()->json(['status' => 'error', 'message' => 'Email atau password salah'], 401);
+        $validator = Validator::make($request->all(), [
+            'email'    => 'required|string|email',
+            'password' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['status' => 'error', 'errors' => $validator->errors()], 422);
         }
+
+        $credentials = $request->only('email', 'password');
+
+        if (!$token = Auth::attempt($credentials)) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email atau password salah'
+            ], 401);
+        }
+
         return response()->json([
             'status'       => 'success',
             'token'        => $token,
             'token_type'   => 'bearer',
-            'expires_in'   => Auth::guard('api')->factory()->getTTL() * 60,
-            'user'         => Auth::guard('api')->user(),
+            'expires_in'   => Auth::factory()->getTTL() * 60,
+            'user'         => Auth::user(),
         ]);
     }
 
     public function refresh()
     {
-        $token = Auth::guard('api')->refresh();
+        $token = Auth::refresh();
         return response()->json([
             'status'     => 'success',
             'token'      => $token,
             'token_type' => 'bearer',
-            'expires_in' => Auth::guard('api')->factory()->getTTL() * 60,
+            'expires_in' => Auth::factory()->getTTL() * 60,
         ]);
     }
 
     public function logout()
     {
-        Auth::guard('api')->logout();
+        Auth::logout();
         return response()->json(['status' => 'success', 'message' => 'Logout berhasil']);
     }
 
@@ -71,7 +91,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'status' => 'success',
-            'user'   => Auth::guard('api')->user(),
+            'user'   => Auth::user(),
         ]);
     }
 }
